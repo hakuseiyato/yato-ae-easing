@@ -1,0 +1,215 @@
+/* Yato Easing - スタイル
+ * 配色はすべて CSS 変数。main.js が AE のスキン色から実行時に上書きする
+ * （未取得時のフォールバックとして AE ダークグレー相当を既定値に置く）。
+ * --ye-accent が単一アクセント。曲線・ハンドル・主ボタンに使う。
+ */
+:root {
+    --ye-bg: #2b2b2b;
+    --ye-surface: #232323;
+    --ye-border: #1c1c1c;
+    --ye-text: #d4d4d4;
+    --ye-dim: #9a9a9a;
+    --ye-input: #1c1c1c;
+    --ye-grid: #3a3a3a;
+    --ye-diag: #4a4a4a;
+    --ye-hline: #7a7a7a;
+    --ye-btn: #3a3a3a;
+    --ye-btn-hover: #4a4a4a;
+    --ye-accent: #28c2cf;        /* 単一アクセント（ティール系）*/
+    --ye-accent-hover: #45d2dd;
+    --ye-accent-text: #06222a;   /* アクセント上の文字 */
+}
+
+* { box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;                 /* パネル外への飛び出し防止 */
+    background: var(--ye-bg);
+    color: var(--ye-text);
+    font-family: "Segoe UI", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    height: 100%;
+}
+
+/* --- 動くプレビュー（3表現）--- */
+#previewBox {
+    display: flex;
+    gap: 6px;
+    background: var(--ye-surface);
+    border: 1px solid var(--ye-border);
+    border-radius: 3px;
+    padding: 8px;
+}
+.pv-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.pv-stage {
+    position: relative;
+    width: 100%;
+    height: 26px;
+    overflow: hidden;
+}
+.pv-stage.pv-center { display: flex; align-items: center; justify-content: center; }
+.pv-obj {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--ye-accent);
+    will-change: transform, opacity;
+}
+#pvMove {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.pv-label { font-size: 10px; color: var(--ye-dim); letter-spacing: 0.06em; }
+
+/* --- ベジェエディタ --- */
+#editorBox {
+    background: var(--ye-surface);
+    border: 1px solid var(--ye-border);
+    border-radius: 3px;
+    padding: 4px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+}
+#editor { width: 100%; height: 100%; touch-action: none; }
+
+/* SVG（CSS が presentation 属性より優先される）*/
+.ye-grid line { stroke: var(--ye-grid); stroke-width: 0.5; }
+.ye-diag { stroke: var(--ye-diag); stroke-width: 0.5; }
+.ye-hline { stroke: var(--ye-hline); stroke-width: 1; }
+.ye-curve { stroke: var(--ye-accent); stroke-width: 2; }
+.handle { stroke: var(--ye-accent); stroke-width: 1.5; cursor: grab; }
+.handle-out { fill: var(--ye-accent); }                 /* Out = 塗り */
+.handle-in  { fill: var(--ye-surface); }                /* In  = リング */
+.handle:active { cursor: grabbing; }
+
+/* --- 数値入力 --- */
+#inputs { display: flex; gap: 8px; }
+#inputs label {
+    flex: 1;
+    min-width: 0;                     /* 入力欄の横はみ出し防止 */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--ye-dim);
+    letter-spacing: 0.04em;
+}
+#inputs input {
+    width: 100%;
+    min-width: 0;
+    background: var(--ye-input);
+    border: 1px solid var(--ye-grid);
+    color: var(--ye-text);
+    border-radius: 3px;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+#inputs input:focus { outline: none; border-color: var(--ye-accent); }
+
+/* --- ボタン --- */
+button {
+    background: var(--ye-btn);
+    border: 1px solid var(--ye-border);
+    color: var(--ye-text);
+    border-radius: 3px;
+    padding: 5px 6px;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.08s ease;
+}
+button:hover { background: var(--ye-btn-hover); }
+button:active { transform: translateY(1px); }
+button.primary { background: var(--ye-accent); border-color: var(--ye-border); color: var(--ye-accent-text); font-weight: 600; }
+button.primary:hover { background: var(--ye-accent-hover); }
+
+#tools { display: flex; }
+#tools button { flex: 1; padding: 5px; }
+
+#quick { display: flex; gap: 4px; }
+#quick .qbtn { flex: 1; min-width: 0; padding: 5px 2px; }
+
+/* --- プリセット --- */
+#presets { display: flex; flex-direction: column; gap: 5px; }
+.preset-save { display: flex; gap: 6px; }
+.preset-save input {
+    flex: 1;
+    min-width: 0;
+    background: var(--ye-input);
+    border: 1px solid var(--ye-grid);
+    color: var(--ye-text);
+    border-radius: 3px;
+    padding: 4px 6px;
+    font-size: 12px;
+}
+.preset-save input:focus { outline: none; border-color: var(--ye-accent); }
+.preset-save button { padding: 4px 12px; }
+#presetList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 70px;
+    overflow-y: auto;
+}
+.preset-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--ye-btn);
+    border: 1px solid var(--ye-border);
+    border-radius: 3px;
+    padding: 3px 4px 3px 9px;
+    font-size: 11px;
+    cursor: pointer;
+}
+.preset-chip:hover { background: var(--ye-btn-hover); }
+.preset-chip .x {
+    display: inline-flex;
+    width: 15px;
+    height: 15px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    color: var(--ye-dim);
+    font-size: 13px;
+    line-height: 1;
+}
+.preset-chip .x:hover { background: rgba(127, 127, 127, 0.25); color: var(--ye-text); }
+.preset-empty { font-size: 10px; color: var(--ye-dim); padding: 2px 0; }
+
+#actions { display: flex; gap: 6px; }
+#actions button { flex: 1; padding: 7px; }
+
+/* --- ステータス --- */
+#status {
+    font-size: 11px;
+    color: var(--ye-dim);
+    min-height: 15px;
+    text-align: center;
+    letter-spacing: 0.02em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#status.err { color: #ff6b6b; }
+#status.ok { color: var(--ye-accent); }

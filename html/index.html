@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';" />
+    <title>Yato Easing</title>
+    <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+    <div id="app">
+
+        <!-- 動くプレビュー（移動・拡縮・透明の3表現）-->
+        <div id="previewBox">
+            <div class="pv-cell">
+                <div class="pv-stage"><div id="pvMove" class="pv-obj"></div></div>
+                <span class="pv-label">移動</span>
+            </div>
+            <div class="pv-cell">
+                <div class="pv-stage pv-center"><div id="pvScale" class="pv-obj"></div></div>
+                <span class="pv-label">拡縮</span>
+            </div>
+            <div class="pv-cell">
+                <div class="pv-stage pv-center"><div id="pvFade" class="pv-obj"></div></div>
+                <span class="pv-label">透明</span>
+            </div>
+        </div>
+
+        <!-- ベジェエディタ（曲線プレビュー兼操作）-->
+        <div id="editorBox">
+            <svg id="editor" viewBox="-8 -44 136 206" preserveAspectRatio="xMidYMid meet">
+                <g id="grid" class="ye-grid">
+                    <line x1="0" y1="0" x2="120" y2="0" />
+                    <line x1="0" y1="120" x2="120" y2="120" />
+                    <line x1="0" y1="0" x2="0" y2="120" />
+                    <line x1="120" y1="0" x2="120" y2="120" />
+                    <line x1="40" y1="0" x2="40" y2="120" />
+                    <line x1="80" y1="0" x2="80" y2="120" />
+                    <line x1="0" y1="40" x2="120" y2="40" />
+                    <line x1="0" y1="80" x2="120" y2="80" />
+                </g>
+                <line id="diag" class="ye-diag" x1="0" y1="120" x2="120" y2="0" stroke-dasharray="2 2" />
+                <line id="h1line" class="ye-hline" />
+                <line id="h2line" class="ye-hline" />
+                <path id="curve" class="ye-curve" fill="none" />
+                <!-- Out 側ハンドル＝塗り、In 側ハンドル＝リング（単一アクセントで in/out 判別）-->
+                <circle id="h1" class="handle handle-out" r="5" />
+                <circle id="h2" class="handle handle-in" r="5" />
+            </svg>
+        </div>
+
+        <!-- 編集ツール -->
+        <div id="tools">
+            <button id="btnFlip" title="曲線を上下反転（加減速を反転）">上下反転</button>
+        </div>
+
+        <!-- 数値入力 -->
+        <div id="inputs">
+            <label>In <input id="inInf" type="number" min="0" max="100" step="1" /> %</label>
+            <label>Out <input id="outInf" type="number" min="0" max="100" step="1" /> %</label>
+        </div>
+
+        <!-- クイックイーズ -->
+        <div id="quick">
+            <button class="qbtn" data-c="0,0,1,1">Linear</button>
+            <button class="qbtn" data-c="0.333,0,1,1">In</button>
+            <button class="qbtn" data-c="0,0,0.667,1">Out</button>
+            <button class="qbtn" data-c="0.333,0,0.667,1">InOut</button>
+        </div>
+
+        <!-- プリセット（localStorage 保存）-->
+        <div id="presets">
+            <div class="preset-save">
+                <input id="presetName" type="text" placeholder="プリセット名" maxlength="24" />
+                <button id="btnSavePreset" title="現在の曲線を保存">保存</button>
+            </div>
+            <div id="presetList"></div>
+        </div>
+
+        <!-- 主操作 -->
+        <div id="actions">
+            <button id="btnCopy" title="選択キーのイーズを取得">Copy</button>
+            <button id="btnApply" class="primary" title="この曲線を選択キーへ適用">Apply</button>
+        </div>
+
+        <div id="status">準備完了</div>
+    </div>
+
+    <script src="../js/libs/CSInterface.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+</html>
